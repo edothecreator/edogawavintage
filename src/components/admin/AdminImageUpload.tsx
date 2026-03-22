@@ -11,7 +11,7 @@ export type AdminImageUploadProps = {
   onThumbnailChange: (value: string) => void;
   target?: AdminImageUploadTarget;
   endpoint?: string;
-  onError?: (message: string) => void;
+  onError?: (message: string | null) => void;
   className?: string;
 };
 
@@ -33,8 +33,14 @@ export function AdminImageUpload({
     e.target.value = "";
     if (!file) return;
     setError(null);
+    onError?.(null);
     try {
       const url = await upload(file);
+      if (target === "images" || target === "both") {
+        const next =
+          imagesText.trim().length === 0 ? url : `${imagesText.trim()}\n${url}`;
+        onImagesTextChange(next);
+      }
       if (target === "thumbnail" || target === "both") {
         if (target === "thumbnail") {
           onThumbnailChange(url);
@@ -42,14 +48,8 @@ export function AdminImageUpload({
           onThumbnailChange(url);
         }
       }
-      if (target === "images" || target === "both") {
-        const next =
-          imagesText.trim().length === 0 ? url : `${imagesText.trim()}\n${url}`;
-        onImagesTextChange(next);
-      }
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Upload failed";
-      onError?.(msg);
+    } catch {
+      /* message shown via hook `error` */
     }
   }
 
@@ -77,7 +77,7 @@ export function AdminImageUpload({
         disabled={uploading}
         onChange={onFileChange}
       />
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         <Button
           type="button"
           variant="secondary"
@@ -86,6 +86,9 @@ export function AdminImageUpload({
         >
           {uploading ? "Uploading…" : "Choose image"}
         </Button>
+        {uploading ? (
+          <span className="text-xs text-[var(--ev-text-muted)]">Sending to Cloudinary…</span>
+        ) : null}
       </div>
       {error ? <p className="mt-2 text-xs text-red-400">{error}</p> : null}
     </div>
