@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
+import { AdminImageUpload } from "@/components/admin/AdminImageUpload";
 
 function specsToLines(specs: Record<string, string>) {
   return Object.entries(specs)
@@ -107,19 +108,6 @@ export function ProductForm({ categories, initial }: Props) {
   useEffect(() => {
     if (quantity <= 0) setInStock(false);
   }, [quantity]);
-
-  async function uploadFile(file: File) {
-    const fd = new FormData();
-    fd.set("file", file);
-    const res = await fetch("/api/admin/upload", {
-      method: "POST",
-      body: fd,
-      credentials: "include",
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Upload failed");
-    return data.url as string;
-  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -311,25 +299,15 @@ export function ProductForm({ categories, initial }: Props) {
         onChange={(e) => setThumbnail(e.target.value)}
         required
       />
-      <div className="rounded-[var(--ev-radius-sm)] border border-[var(--ev-border)] bg-[var(--ev-surface)] p-4 text-sm text-[var(--ev-text-muted)]">
-        <p className="text-[var(--ev-text)]">Upload image</p>
-        <input
-          type="file"
-          accept="image/*"
-          className="mt-2 w-full text-xs"
-          onChange={async (e) => {
-            const f = e.target.files?.[0];
-            if (!f) return;
-            try {
-              const url = await uploadFile(f);
-              setImagesText((t) => (t ? `${t.trim()}\n${url}` : url));
-              if (!thumbnail) setThumbnail(url);
-            } catch (err) {
-              setError(err instanceof Error ? err.message : "Upload failed");
-            }
-          }}
-        />
-      </div>
+      <AdminImageUpload
+        imagesText={imagesText}
+        thumbnail={thumbnail}
+        onImagesTextChange={setImagesText}
+        onThumbnailChange={setThumbnail}
+        target="both"
+        endpoint="/api/upload"
+        onError={setError}
+      />
       {error && <p className="text-sm text-red-400">{error}</p>}
       <div className="flex flex-wrap gap-3">
         <Button type="submit" disabled={loading}>
