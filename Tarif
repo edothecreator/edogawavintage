@@ -1,17 +1,371 @@
 # City [space] shipping tariff (currency matches store; last token = numeric fee)
 # Multi-word cities: all words except the last form the city name.
-Casablanca 35
-Rabat 30
-Marrakech 40
-Fès 38
-Tanger 45
-Agadir 42
-Oujda 50
-Laayoune 55
-Kenitra 32
-Mohammedia 33
-El Jadida 36
-Safi 38
-Beni Mellal 40
-Khénifra 44
-Essaouira 41
+Casablanca 18
+Mohammedia 35
+Bouskoura 35
+Dar bouaza 35
+Al rahma 35
+Tamaris 35
+Ain harrouda 33
+Deroua 33
+Nouaceur 33
+Mediouna 33
+Tit mellil 33
+Sidi rehal 29
+Marrakech 35
+Meknes 35
+Tetouan 35
+Kenitra 35
+Rabat 35
+Sale 35
+Sale el jadida 35
+Temara 35
+Agadir 35
+Fes 35
+Berrchid 35
+Had soualem 35
+Tanger 35
+Safi 35
+El jadida 35
+Bouznika 35
+Ait addou 35
+Agdz 35
+Bouderbala 37
+Chefchaouen 37
+Sidi bouzid 37
+Zoumi 37
+Oulad berhili 37
+Ait balouna 39
+Toumliwana 39
+Igoudmanet 39
+Mrimina 39
+Battou 39
+Guelta zemmur 39
+Settat 35
+Beni mellal 35
+Rehamna 40
+Tnine mhaya 45
+Ain taoujdate 45
+Sabaa aiyoun 45
+Boufakrane 45
+El hajeb 45
+Agourai 45
+Boujdour 45
+Martil 45
+M diq 45
+Fnideq 45
+Errachidia 45
+Oujda 45
+Nador 45
+Selouane 45
+Al aaroui 45
+Zaio 45
+Driouch 45
+Khouribga 45
+Oued zem 45
+Boulanouar 45
+Boujniba 45
+Bir mezoui 45
+Khemisset 45
+Tiflet 45
+Dakhla 45
+Sidi taibi 45
+Sidi yahya el gharb 45
+Allal tazi 45
+Mechra bel ksiri 45
+Sidi sliman 45
+Sidi kacem 45
+Mehdya 45
+Tan tan 45
+Guelmim 45
+Bouizakarne 45
+Tleta el akhsass 45
+Tarhjijt 45
+Ifrane atlas saghir 45
+Timoulay 45
+Sidi ifni 45
+Tamesna 45
+Skhirat 45
+Ouarzazat 45
+Ait zineb 45
+Tabounte 45
+Tajda 45
+Timdline 45
+Tifoultoute 45
+Ifran 45
+Azrou 45
+Inzegane 45
+Dcheira 45
+Ait meloul 45
+Sidi bibi 45
+Taghazoute 45
+Ain bida 45
+Oulad ettayeb 45
+Ain allah 45
+Sidi harazem 45
+Essmara 45
+Al hoceima 45
+Ajdir 45
+Boukidaren 45
+Ait kamra 45
+Imzouren 45
+Youssoufia 45
+Essaouira 45
+Ounagha 45
+Taftecht 45
+Mejji 45
+Talmest 45
+Akermoud 45
+Zaouiet bouzarktoune 45
+Smimou 45
+Tamanar 45
+Sidi kaouki 45
+Mrirt 45
+Khenifra 45
+Ben guerir 45
+Taroudannt 45
+Oulad teima 45
+Ait laaza 45
+Aoulouz 45
+Irherm 45
+Taliouine 45
+Sebt el guerdane 45
+Berkane 45
+Saidia 45
+Ras el ma 45
+Bni drar 45
+Ahfir 45
+Aklim 45
+Zeghanghane 45
+Farkhana 45
+Taza 45
+Guercif 45
+Tiznit 45
+Had hrara 45
+Sebt gzoula 45
+Tleta sidi bouguedra 45
+Larache 45
+Ksar el kebir 45
+Sidi messaoud 45
+El kelaa des sraghna 45
+Azemmour 45
+Moulay abdellah 45
+Oualidia 45
+Sidi bennour 45
+Beni ansar 45
+Izemmouren 45
+Laayoune 45
+El marsa 45
+Fquih ben salah 45
+Sebt oulad nemma 45
+Afourer 45
+Ouled yaiche 45
+El ksiba 45
+Ain aouda 45
+Tamansourt 45
+Benslimane 45
+Kasbah tadla 45
+Chemaia 45
+Ourika 45
+Tahannaout 45
+Ait ourir 45
+Touama 45
+Oudaya 45
+Chichaoua 45
+Assilah 45
+Sefrou 45
+Taourirt 45
+Chouiter 45
+Sidi allal el bahraoui 45
+Romani 45
+Oualmas 45
+Ouazzane 45
+Ain dorij 45
+Masmouda 45
+Sidi redouane 45
+Asjen 45
+Moqrisset 45
+Harhoura 45
+Laattaouia 45
+Rissani 45
+Arfoud 45
+Merzouga 45
+Taddart 45
+Bni bouayach 45
+Azilal 45
+Ouaouizeght 45
+Bejaad 45
+Tinghir 45
+Boumalne dades 45
+Kalaat mgouna 45
+Alnif 45
+Bou adel 45
+Khlalfa 45
+Ain mediouna 45
+Ain aicha 45
+Taounate 45
+Awrir 45
+Ait amira 45
+Belfaa 45
+Anza 45
+Derdara 45
+Bab taza 45
+Akchour 45
+Bab berred 45
+El jebeha 45
+Midelt 45
+Jerada 45
+Bouarfa 45
+Laayoun cherqia 45
+Zagora 45
+Tamegroute 45
+Tagomite 45
+Mhamid lghezlane 45
+Nkob 45
+Tazzarine 45
+Taghbalte 45
+Errich 45
+Missour 45
+Boumia 45
+Tinjdad 45
+Gulmima 45
+Sidi bouknadel 45
+Imintanoute 45
+Demnate 45
+Ouad laou 45
+Cabo negro 45
+Khmiss zemamera 45
+Sidi smail 45
+Oulad fraj 45
+Mellalyã¨ne 45
+Assa 45
+Lakhssas 45
+Aoufous 45
+Boudnib 45
+Ben ahmed 45
+Sidi bou othmane 45
+Asni 45
+Souk elarbaa du gharb 45
+Azla 45
+Marina 45
+Ain atig 45
+Mers lkhir 45
+Sidi yahya zair 45
+Ain chgeg 45
+Jorf sfer 45
+Bir jdid 45
+Midar 45
+Tamsaman 45
+Tafarist 45
+Bentayab 45
+Sidi ismail 45
+El gara 45
+Bni oukil 45
+Jemaat shaim 45
+Beni kla 45
+Jorf el melha 45
+Tikiwine 45
+Arzou-agadir 45
+El outia 45
+Tizi ousli 45
+Tahla 45
+Mrija 45
+Hed wlad zbayr 45
+El cap 45
+Azghar 45
+Ait hicham 45
+Talla 45
+Boukidan 45
+Swani 45
+Skhour rhamna 45
+Imouzar kandar 45
+Oued amlil 45
+Biougra 45
+Mensouria 45
+Tighsalin 45
+Laayoune-oujda 45
+Kkerrouchen 45
+Ghafsai 45
+Tata 45
+Moulay yacoub 45
+Ait ishak 45
+Ighrem laalam 45
+Sidi jaber 45
+Figuig 45
+Ksar sghir 45
+Oulad ayad 45
+Dar oulad zidoune 45
+Zaouiat cheikh 45
+Moulay bouaza 45
+Laouamra 45
+Aglmous 45
+Houara 45
+Mireleft 45
+Tilmia 45
+Bouljami 45
+Ait marghade 45
+Msemriro 45
+Taadadati 45
+Ait karmas 45
+Bab attoutchy 45
+Tiidrinas 45
+Ait hanik 45
+Tamtetouchte 45
+Timkitek 45
+Akouras 45
+Ait oulghouma 45
+Illigha 45
+Foum zguid 45
+El merja 45
+Hassilabied 45
+Ait chaib rass 45
+Tadaout 45
+Alnifa 45
+Tanout 45
+Ait kherdi 45
+Tifirit 45
+Oumjrane 45
+Takchawa 45
+Tarnawa 45
+Aghallal 45
+Al mahbes 45
+Al farssia 45
+Tifariti 45
+Bir lehlou 45
+Oum dreyga 45
+Lqliaa 45
+Madagh 45
+Regada 45
+Jaadar 45
+Bouarg 45
+Arkman 45
+Teztoutin 45
+Dar el kebdani 45
+Taouima 45
+Ihdaden 45
+Kassita 45
+Crona 45
+Ouled settout 45
+Boudinar 45
+Anwal 45
+Amzarou 45
+Mariouari 45
+Bouhlou 45
+Aknoul 45
+Bourd 45
+Sidi ali bourakba 45
+Ain hamra 45
+Hed ouled zbir 45
+Kaldman 45
+Issagen 45
+Targist 45
+Debdou 45
+Tendrara 45
+Ain beni mathar 45
+Bergem 45
+Cafe maure 45
+Lamris 45
+Naima Région 45
+Moulay bousselham 45
+Khenichet 45
+Lalla mimouna 45
