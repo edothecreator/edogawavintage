@@ -1,8 +1,20 @@
 import { prisma } from "@/lib/prisma";
+import { tryDb } from "@/lib/db-safe";
 import { ProductForm } from "@/components/admin/ProductForm";
+import { AdminDatabaseOffline } from "@/components/admin/AdminDatabaseOffline";
 
 export default async function NewProductPage() {
-  const categories = await prisma.category.findMany({ orderBy: { name: "asc" } });
+  const loaded = await tryDb(() =>
+    prisma.category.findMany({ orderBy: { name: "asc" } }),
+  );
+  if (!loaded.ok) {
+    return (
+      <div className="space-y-8">
+        <AdminDatabaseOffline />
+      </div>
+    );
+  }
+  const categories = loaded.data;
   return (
     <div className="space-y-8">
       <div>

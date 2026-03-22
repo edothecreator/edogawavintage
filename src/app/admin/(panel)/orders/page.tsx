@@ -1,12 +1,26 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { tryDb } from "@/lib/db-safe";
 import { formatMoney } from "@/lib/format";
+import { AdminDatabaseOffline } from "@/components/admin/AdminDatabaseOffline";
 
 export default async function AdminOrdersPage() {
-  const orders = await prisma.order.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { items: true },
-  });
+  const loaded = await tryDb(() =>
+    prisma.order.findMany({
+      orderBy: { createdAt: "desc" },
+      include: { items: true },
+    }),
+  );
+
+  if (!loaded.ok) {
+    return (
+      <div className="space-y-8">
+        <AdminDatabaseOffline />
+      </div>
+    );
+  }
+
+  const orders = loaded.data;
 
   return (
     <div className="space-y-8">

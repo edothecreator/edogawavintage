@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { tryDb } from "@/lib/db-safe";
 import { formatMoney } from "@/lib/format";
+import { AdminDatabaseOffline } from "@/components/admin/AdminDatabaseOffline";
 import { ORDER_STATUSES } from "@/lib/constants";
 import { OrderStatusForm } from "@/components/admin/OrderStatusForm";
 
@@ -9,10 +11,20 @@ type Props = { params: Promise<{ id: string }> };
 
 export default async function AdminOrderDetailPage({ params }: Props) {
   const { id } = await params;
-  const order = await prisma.order.findUnique({
-    where: { id },
-    include: { items: true },
-  });
+  const loaded = await tryDb(() =>
+    prisma.order.findUnique({
+      where: { id },
+      include: { items: true },
+    }),
+  );
+  if (!loaded.ok) {
+    return (
+      <div className="space-y-8">
+        <AdminDatabaseOffline />
+      </div>
+    );
+  }
+  const order = loaded.data;
   if (!order) notFound();
 
   return (

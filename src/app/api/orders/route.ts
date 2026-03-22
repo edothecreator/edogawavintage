@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { isDatabaseUnavailableError, tryDb } from "@/lib/db-safe";
 import { DELIVERY_FEE_USD } from "@/lib/constants";
 import { trackPurchase } from "@/lib/analytics";
 
@@ -30,9 +31,18 @@ export async function POST(req: Request) {
     const { customerName, phone, address, city, note, paymentMethod, items } = parsed.data;
 
     const productIds = [...new Set(items.map((i) => i.productId))];
-    const products = await prisma.product.findMany({
-      where: { id: { in: productIds } },
-    });
+    const loaded = await tryDb(() =>
+      prisma.product.findMany({
+        where: { id: { in: productIds } },
+      }),
+    );
+    if (!loaded.ok) {
+      return NextResponse.json(
+        { error: "Checkout is temporarily unavailable—the catalog database is offline." },
+        { status: 503 },
+      );
+    }
+    const products = loaded.data;
     const byId = new Map(products.map((p) => [p.id, p]));
 
     let subtotal = new Prisma.Decimal(0);
@@ -119,6 +129,12 @@ export async function POST(req: Request) {
       paymentMethod: order.paymentMethod,
     });
   } catch (e) {
+    if (isDatabaseUnavailableError(e)) {
+      return NextResponse.json(
+        { error: "Checkout is temporarily unavailable—the catalog database is offline." },
+        { status: 503 },
+      );
+    }
     console.error(e);
     return NextResponse.json({ error: "Could not place order" }, { status: 500 });
   }

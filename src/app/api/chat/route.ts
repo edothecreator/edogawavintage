@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { tryDb } from "@/lib/db-safe";
 import { parseJsonArray } from "@/lib/format";
 import { toProductCard } from "@/lib/product-types";
 
@@ -29,12 +30,15 @@ type CatalogItem = {
 };
 
 async function loadInStockCatalog(): Promise<CatalogItem[]> {
-  const rows = await prisma.product.findMany({
-    where: { inStock: true, quantity: { gt: 0 } },
-    include: { category: { select: { slug: true } } },
-    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
-  });
-  return rows.map((p) => ({
+  const rows = await tryDb(() =>
+    prisma.product.findMany({
+      where: { inStock: true, quantity: { gt: 0 } },
+      include: { category: { select: { slug: true } } },
+      orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+    }),
+  );
+  if (!rows.ok) return [];
+  return rows.data.map((p) => ({
     slug: p.slug,
     name: p.name,
     brand: p.brand,
@@ -143,19 +147,19 @@ ${JSON.stringify(catalog)}`,
     }
 
     const slugs = out.data.recommendedSlugs.filter((s) => allowedSlugs.has(s));
-    const products =
+    const rows = await tryDb(() =>
       slugs.length === 0
-        ? []
-        : (
-            await prisma.product.findMany({
-              where: {
-                slug: { in: slugs },
-                inStock: true,
-                quantity: { gt: 0 },
-              },
-              include: { category: { select: { slug: true, name: true } } },
-            })
-          ).map(toProductCard);
+        ? Promise.resolve([])
+        : prisma.product.findMany({
+            where: {
+              slug: { in: slugs },
+              inStock: true,
+              quantity: { gt: 0 },
+            },
+            include: { category: { select: { slug: true, name: true } } },
+          }),
+    );
+    const products = rows.ok ? rows.data.map(toProductCard) : [];
 
     return NextResponse.json({
       reply: out.data.reply,

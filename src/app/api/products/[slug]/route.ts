@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { isDatabaseUnavailableError } from "@/lib/db-safe";
 import { toProductCard, productImages, productIncluded, productSpecs } from "@/lib/product-types";
 
 export async function GET(
@@ -25,6 +26,12 @@ export async function GET(
       },
     });
   } catch (e) {
+    if (isDatabaseUnavailableError(e)) {
+      return NextResponse.json(
+        { error: "Database unavailable", code: "DB_OFFLINE" },
+        { status: 503 },
+      );
+    }
     console.error(e);
     return NextResponse.json({ error: "Failed to load product" }, { status: 500 });
   }

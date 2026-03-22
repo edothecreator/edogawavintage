@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { databaseUnavailableJsonResponse, isDatabaseUnavailableError } from "@/lib/db-safe";
 import { verifyAdminSession } from "@/lib/admin-auth";
 import { toProductCard } from "@/lib/product-types";
 
@@ -67,6 +68,7 @@ export async function PUT(
     });
     return NextResponse.json({ product: toProductCard(updated) });
   } catch (e) {
+    if (isDatabaseUnavailableError(e)) return databaseUnavailableJsonResponse();
     console.error(e);
     return NextResponse.json({ error: "Could not update product" }, { status: 500 });
   }
@@ -83,6 +85,7 @@ export async function DELETE(
     await prisma.product.delete({ where: { id } });
     return NextResponse.json({ ok: true });
   } catch (e) {
+    if (isDatabaseUnavailableError(e)) return databaseUnavailableJsonResponse();
     console.error(e);
     return NextResponse.json({ error: "Could not delete product" }, { status: 500 });
   }

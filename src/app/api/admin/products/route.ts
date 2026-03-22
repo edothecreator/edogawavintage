@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { databaseUnavailableJsonResponse, isDatabaseUnavailableError } from "@/lib/db-safe";
 import { verifyAdminSession } from "@/lib/admin-auth";
 import { toProductCard } from "@/lib/product-types";
 
@@ -29,11 +30,16 @@ const productBody = z.object({
 export async function GET() {
   const ok = await verifyAdminSession();
   if (!ok) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const products = await prisma.product.findMany({
-    orderBy: { updatedAt: "desc" },
-    include: { category: { select: { slug: true, name: true } } },
-  });
-  return NextResponse.json({ products: products.map(toProductCard) });
+  try {
+    const products = await prisma.product.findMany({
+      orderBy: { updatedAt: "desc" },
+      include: { category: { select: { slug: true, name: true } } },
+    });
+    return NextResponse.json({ products: products.map(toProductCard) });
+  } catch (e) {
+    if (isDatabaseUnavailableError(e)) return databaseUnavailableJsonResponse();
+    throw e;
+  }
 }
 
 export async function POST(req: Request) {
@@ -72,6 +78,7 @@ export async function POST(req: Request) {
     });
     return NextResponse.json({ product: toProductCard(created) });
   } catch (e) {
+    if (isDatabaseUnavailableError(e)) return databaseUnavailableJsonResponse();
     console.error(e);
     return NextResponse.json({ error: "Could not create product" }, { status: 500 });
   }

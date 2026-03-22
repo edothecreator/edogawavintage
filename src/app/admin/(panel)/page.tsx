@@ -1,29 +1,42 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { tryDb } from "@/lib/db-safe";
 import { formatMoney } from "@/lib/format";
+import { AdminDatabaseOffline } from "@/components/admin/AdminDatabaseOffline";
 
 export default async function AdminHomePage() {
-  const [productCount, orderCount, revenue, pendingOrders, lowStock] = await Promise.all([
-    prisma.product.count(),
-    prisma.order.count(),
-    prisma.order.aggregate({ _sum: { total: true } }),
-    prisma.order.findMany({
-      where: { status: { in: ["pending", "confirmed", "preparing"] } },
-      orderBy: { createdAt: "desc" },
-      take: 6,
-      include: { items: true },
-    }),
-    prisma.product.findMany({
-      where: {
-        inStock: true,
-        quantity: { lte: 2, gt: 0 },
-      },
-      orderBy: { quantity: "asc" },
-      take: 6,
-      include: { category: true },
-    }),
-  ]);
+  const snap = await tryDb(() =>
+    Promise.all([
+      prisma.product.count(),
+      prisma.order.count(),
+      prisma.order.aggregate({ _sum: { total: true } }),
+      prisma.order.findMany({
+        where: { status: { in: ["pending", "confirmed", "preparing"] } },
+        orderBy: { createdAt: "desc" },
+        take: 6,
+        include: { items: true },
+      }),
+      prisma.product.findMany({
+        where: {
+          inStock: true,
+          quantity: { lte: 2, gt: 0 },
+        },
+        orderBy: { quantity: "asc" },
+        take: 6,
+        include: { category: true },
+      }),
+    ]),
+  );
 
+  if (!snap.ok) {
+    return (
+      <div className="space-y-8">
+        <AdminDatabaseOffline />
+      </div>
+    );
+  }
+
+  const [productCount, orderCount, revenue, pendingOrders, lowStock] = snap.data;
   const sum = revenue._sum.total ? Number(revenue._sum.total) : 0;
 
   return (

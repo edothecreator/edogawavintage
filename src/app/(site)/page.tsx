@@ -1,31 +1,47 @@
 import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
+import {
+  DEMO_CATEGORIES,
+  DEMO_TESTIMONIALS,
+  demoFeaturedProducts,
+  demoFreshProducts,
+} from "@/lib/db-fallback-data";
+import { tryDb } from "@/lib/db-safe";
 import { toProductCard } from "@/lib/product-types";
 import { ProductCard } from "@/components/product/ProductCard";
 import { SectionTitle } from "@/components/layout/SectionTitle";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { DbFallbackNotice } from "@/components/site/DbFallbackNotice";
 
 export default async function HomePage() {
-  const [featured, fresh, categories, testimonials] = await Promise.all([
-    prisma.product.findMany({
-      where: { featured: true },
-      orderBy: { updatedAt: "desc" },
-      take: 3,
-      include: { category: { select: { slug: true, name: true } } },
-    }),
-    prisma.product.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 4,
-      include: { category: { select: { slug: true, name: true } } },
-    }),
-    prisma.category.findMany({ orderBy: { name: "asc" } }),
-    prisma.testimonial.findMany({ orderBy: { sortOrder: "asc" }, take: 3 }),
-  ]);
+  const home = await tryDb(() =>
+    Promise.all([
+      prisma.product.findMany({
+        where: { featured: true },
+        orderBy: { updatedAt: "desc" },
+        take: 3,
+        include: { category: { select: { slug: true, name: true } } },
+      }),
+      prisma.product.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 4,
+        include: { category: { select: { slug: true, name: true } } },
+      }),
+      prisma.category.findMany({ orderBy: { name: "asc" } }),
+      prisma.testimonial.findMany({ orderBy: { sortOrder: "asc" }, take: 3 }),
+    ]),
+  );
+
+  const dbDown = !home.ok;
+  const [featured, fresh, categories, testimonials] = home.ok
+    ? home.data
+    : [demoFeaturedProducts(), demoFreshProducts(), DEMO_CATEGORIES, DEMO_TESTIMONIALS];
 
   return (
     <div className="flex flex-col">
+      {dbDown ? <DbFallbackNotice /> : null}
       <section className="relative overflow-hidden border-b border-[var(--ev-border)]">
         <div className="absolute inset-0">
           <Image

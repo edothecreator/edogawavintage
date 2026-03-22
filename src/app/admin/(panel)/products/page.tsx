@@ -1,14 +1,28 @@
 import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
+import { tryDb } from "@/lib/db-safe";
 import { formatMoney } from "@/lib/format";
 import { Button } from "@/components/ui/Button";
+import { AdminDatabaseOffline } from "@/components/admin/AdminDatabaseOffline";
 
 export default async function AdminProductsPage() {
-  const products = await prisma.product.findMany({
-    orderBy: { updatedAt: "desc" },
-    include: { category: true },
-  });
+  const loaded = await tryDb(() =>
+    prisma.product.findMany({
+      orderBy: { updatedAt: "desc" },
+      include: { category: true },
+    }),
+  );
+
+  if (!loaded.ok) {
+    return (
+      <div className="space-y-8">
+        <AdminDatabaseOffline />
+      </div>
+    );
+  }
+
+  const products = loaded.data;
 
   return (
     <div className="space-y-8">

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { demoProductDetailBySlug } from "@/lib/db-fallback-data";
+import { tryDb } from "@/lib/db-safe";
 import {
   isProductPurchasable,
   productImages,
@@ -8,32 +10,61 @@ import {
   productSpecs,
   toProductCard,
 } from "@/lib/product-types";
+import { StorefrontDatabaseOffline } from "@/components/site/StorefrontDatabaseOffline";
 import { formatMoney } from "@/lib/format";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductViewTracker } from "@/components/product/ProductViewTracker";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Badge } from "@/components/ui/Badge";
 import { AddToCartPanel } from "@/components/product/AddToCartPanel";
+import type { Category, Product } from "@prisma/client";
 
 type Props = { params: Promise<{ slug: string }> };
 
+type ProductDetail = Product & { category: Category };
+type RelatedRow = Product & { category: { slug: string; name: string } };
+
 export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
-  const product = await prisma.product.findUnique({
-    where: { slug },
-    include: { category: true },
-  });
+  const loaded = await tryDb(() =>
+    prisma.product.findUnique({
+      where: { slug },
+      include: { category: true },
+    }),
+  );
+
+  if (!loaded.ok) {
+    const demo = demoProductDetailBySlug(slug);
+    if (!demo) return <StorefrontDatabaseOffline />;
+    return <ProductPageContent product={demo} related={[]} />;
+  }
+
+  const product = loaded.data;
   if (!product) notFound();
 
-  const related = await prisma.product.findMany({
-    where: {
-      categoryId: product.categoryId,
-      id: { not: product.id },
-    },
-    orderBy: { featured: "desc" },
-    take: 3,
-    include: { category: { select: { slug: true, name: true } } },
-  });
+  const relatedResult = await tryDb(() =>
+    prisma.product.findMany({
+      where: {
+        categoryId: product.categoryId,
+        id: { not: product.id },
+      },
+      orderBy: { featured: "desc" },
+      take: 3,
+      include: { category: { select: { slug: true, name: true } } },
+    }),
+  );
+  const related = relatedResult.ok ? relatedResult.data : [];
+
+  return <ProductPageContent product={product} related={related} />;
+}
+
+function ProductPageContent({
+  product,
+  related,
+}: {
+  product: ProductDetail;
+  related: RelatedRow[];
+}) {
 
   const images = productImages(product);
   const specs = productSpecs(product);

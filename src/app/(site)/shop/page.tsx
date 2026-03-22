@@ -1,10 +1,17 @@
 import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
+import {
+  DEMO_CATEGORIES,
+  demoBrandsForToolbar,
+  demoProductsWithCardCategory,
+} from "@/lib/db-fallback-data";
+import { tryDb } from "@/lib/db-safe";
 import { buildProductOrderBy, buildProductWhere } from "@/lib/product-query";
 import { toProductCard } from "@/lib/product-types";
 import { ShopToolbar } from "@/components/shop/ShopToolbar";
 import { ProductCard } from "@/components/product/ProductCard";
 import { SectionTitle } from "@/components/layout/SectionTitle";
+import { DbFallbackNotice } from "@/components/site/DbFallbackNotice";
 
 type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -24,24 +31,32 @@ export default async function ShopPage({ searchParams }: Props) {
   const url = toURLSearchParams(raw);
   const where = buildProductWhere(url);
   const orderBy = buildProductOrderBy(url);
-  const [products, brands, categories] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      orderBy,
-      include: { category: { select: { slug: true, name: true } } },
-    }),
-    prisma.product.findMany({
-      distinct: ["brand"],
-      select: { brand: true },
-      orderBy: { brand: "asc" },
-    }),
-    prisma.category.findMany({ orderBy: { name: "asc" } }),
-  ]);
+  const shop = await tryDb(() =>
+    Promise.all([
+      prisma.product.findMany({
+        where,
+        orderBy,
+        include: { category: { select: { slug: true, name: true } } },
+      }),
+      prisma.product.findMany({
+        distinct: ["brand"],
+        select: { brand: true },
+        orderBy: { brand: "asc" },
+      }),
+      prisma.category.findMany({ orderBy: { name: "asc" } }),
+    ]),
+  );
+
+  const dbDown = !shop.ok;
+  const [products, brands, categories] = shop.ok
+    ? shop.data
+    : [demoProductsWithCardCategory(), demoBrandsForToolbar(), DEMO_CATEGORIES];
 
   const cards = products.map(toProductCard);
 
   return (
     <div className="ev-container space-y-8 py-8 sm:space-y-10 sm:py-14">
+      {dbDown ? <DbFallbackNotice /> : null}
       <SectionTitle
         eyebrow="Boutique inventory"
         title="Shop the atelier"

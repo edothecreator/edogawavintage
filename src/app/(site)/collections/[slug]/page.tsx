@@ -1,6 +1,11 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import {
+  DEMO_CATEGORIES,
+  demoBrandsForToolbar,
+} from "@/lib/db-fallback-data";
+import { tryDb } from "@/lib/db-safe";
 import { COLLECTION_SLUGS } from "@/lib/constants";
 import {
   buildProductOrderBy,
@@ -11,6 +16,7 @@ import {
 import { toProductCard } from "@/lib/product-types";
 import { ShopToolbar } from "@/components/shop/ShopToolbar";
 import { ProductCard } from "@/components/product/ProductCard";
+import { DbFallbackNotice } from "@/components/site/DbFallbackNotice";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -34,8 +40,45 @@ const titles: Record<string, string> = {
 
 export default async function CollectionPage({ params, searchParams }: Props) {
   const { slug } = await params;
-  const category = await prisma.category.findUnique({ where: { slug } });
   const isSpecial = (COLLECTION_SLUGS as readonly string[]).includes(slug);
+
+  const catResult = await tryDb(() => prisma.category.findUnique({ where: { slug } }));
+  if (!catResult.ok) {
+    const cw = collectionWhere(slug);
+    if (!cw) notFound();
+    return (
+      <div className="ev-container space-y-8 py-8 sm:space-y-10 sm:py-14">
+        <DbFallbackNotice />
+        <div className="max-w-2xl space-y-3">
+          <p className="text-[10px] uppercase tracking-[0.45em] text-[var(--ev-primary)]">
+            {isSpecial ? "Curated set" : "Collection"}
+          </p>
+          <h1 className="font-display text-4xl text-[var(--ev-text)] sm:text-5xl">
+            {titles[slug] ?? "Collection"}
+          </h1>
+          <p className="text-sm leading-relaxed text-[var(--ev-text-muted)] sm:text-base">
+            We could not load this collection while the database is offline. Try the shop preview or
+            connect Postgres and redeploy.
+          </p>
+        </div>
+        <Suspense
+          fallback={
+            <div className="h-44 animate-pulse rounded-[var(--ev-radius)] bg-[var(--ev-surface)]" />
+          }
+        >
+          <ShopToolbar brands={demoBrandsForToolbar()} categories={DEMO_CATEGORIES} />
+        </Suspense>
+        <div className="rounded-[var(--ev-radius)] border border-dashed border-[var(--ev-border)] bg-[var(--ev-surface)]/60 px-6 py-16 text-center">
+          <p className="font-display text-2xl text-[var(--ev-text)]">Collection unavailable</p>
+          <p className="mt-2 text-sm text-[var(--ev-text-muted)]">
+            No live data—browse the shop for preview listings instead.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const category = catResult.data;
   if (!category && !isSpecial) notFound();
 
   const cw = collectionWhere(slug);
@@ -46,25 +89,33 @@ export default async function CollectionPage({ params, searchParams }: Props) {
   const where = mergeProductWhere(cw, buildProductWhere(url));
   const orderBy = buildProductOrderBy(url);
 
-  const [products, brands, categories] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      orderBy,
-      include: { category: { select: { slug: true, name: true } } },
-    }),
-    prisma.product.findMany({
-      distinct: ["brand"],
-      select: { brand: true },
-      orderBy: { brand: "asc" },
-    }),
-    prisma.category.findMany({ orderBy: { name: "asc" } }),
-  ]);
+  const listResult = await tryDb(() =>
+    Promise.all([
+      prisma.product.findMany({
+        where,
+        orderBy,
+        include: { category: { select: { slug: true, name: true } } },
+      }),
+      prisma.product.findMany({
+        distinct: ["brand"],
+        select: { brand: true },
+        orderBy: { brand: "asc" },
+      }),
+      prisma.category.findMany({ orderBy: { name: "asc" } }),
+    ]),
+  );
+
+  const dbDown = !listResult.ok;
+  const [products, brands, categories] = listResult.ok
+    ? listResult.data
+    : [[], demoBrandsForToolbar(), DEMO_CATEGORIES];
 
   const heading = titles[slug] ?? category?.name ?? "Collection";
   const eyebrow = isSpecial ? "Curated set" : category?.name ?? "Collection";
 
   return (
     <div className="ev-container space-y-8 py-8 sm:space-y-10 sm:py-14">
+      {dbDown ? <DbFallbackNotice /> : null}
       <div className="max-w-2xl space-y-3">
         <p className="text-[10px] uppercase tracking-[0.45em] text-[var(--ev-primary)]">
           {eyebrow}
