@@ -111,27 +111,29 @@ export function SiteHeader() {
           </Link>
           <button
             type="button"
-            className="ev-touch inline-flex min-h-12 min-w-12 flex-col items-center justify-center gap-1.5 rounded-[var(--ev-radius-sm)] border border-[var(--ev-border)] bg-[var(--ev-surface)] active:scale-95 lg:hidden"
+            className="ev-touch relative inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--ev-radius-sm)] border border-[var(--ev-border)] bg-[var(--ev-surface)] text-[var(--ev-text)] transition-[border-color,transform] active:scale-[0.97] aria-expanded:border-[var(--ev-border-strong)] lg:hidden"
             aria-expanded={open}
             aria-controls={open ? menuId : undefined}
             aria-label={open ? "Close navigation menu" : "Open navigation menu"}
             onClick={() => setOpen((v) => !v)}
           >
-            <span
-              className={`block h-0.5 w-5 bg-[var(--ev-text)] transition-transform duration-200 ${
-                open ? "translate-y-2 rotate-45" : ""
-              }`}
-            />
-            <span
-              className={`block h-0.5 w-5 bg-[var(--ev-text)] transition-opacity duration-200 ${
-                open ? "opacity-0" : ""
-              }`}
-            />
-            <span
-              className={`block h-0.5 w-5 bg-[var(--ev-text)] transition-transform duration-200 ${
-                open ? "-translate-y-2 -rotate-45" : ""
-              }`}
-            />
+            <span className="flex h-3 w-[22px] flex-col justify-between" aria-hidden>
+              <span
+                className={`h-0.5 w-full origin-center rounded-full bg-current transition-transform duration-200 ease-out ${
+                  open ? "translate-y-[5px] rotate-45" : ""
+                }`}
+              />
+              <span
+                className={`h-0.5 w-full rounded-full bg-current transition-opacity duration-150 ${
+                  open ? "opacity-0" : "opacity-100"
+                }`}
+              />
+              <span
+                className={`h-0.5 w-full origin-center rounded-full bg-current transition-transform duration-200 ease-out ${
+                  open ? "-translate-y-[5px] -rotate-45" : ""
+                }`}
+              />
+            </span>
           </button>
         </div>
       </div>

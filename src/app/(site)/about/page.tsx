@@ -24,8 +24,8 @@ export default function AboutPage() {
           camcorders that remember family rituals. We test, we note, we photograph the evidence.
         </p>
         <p>
-          This site is a living atelier: inventory changes, stories accumulate, and the concierge
-          learns only from what is truly on the shelf.
+          This site is a living atelier: inventory changes, stories accumulate, and Monsieur Iso
+          speaks only from what is truly on the shelf.
         </p>
       </div>
       <Link href="/shop">

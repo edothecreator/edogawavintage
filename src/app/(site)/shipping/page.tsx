@@ -12,8 +12,9 @@ export default function ShippingPage() {
           business days after confirmation unless otherwise noted.
         </p>
         <p>
-          Delivery fees are calculated at checkout (flat demo fee in this build). Replace with live
-          carrier quotes when integrating logistics.
+          Delivery fees are calculated at checkout from the city you select (see the{" "}
+          <code className="text-[var(--ev-text)]">Tarif</code> list at the project root). Adjust that
+          file to change zones and amounts.
         </p>
         <p>International shipping: add customs guidance and restricted item policies here.</p>
       </section>

@@ -41,7 +41,7 @@ export default function ContactPage() {
           Human support
         </h1>
         <p className="mt-4 text-sm leading-relaxed text-[var(--ev-text-muted)] sm:text-base">
-          For availability checks, condition photos, or pairing advice beyond the concierge, reach
+          For availability checks, condition photos, or pairing advice beyond Monsieur Iso, reach
           our team directly.
         </p>
         <div className="mt-8 space-y-2 text-sm text-[var(--ev-text-muted)]">

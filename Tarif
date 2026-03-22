@@ -1,0 +1,17 @@
+# City [space] shipping tariff (currency matches store; last token = numeric fee)
+# Multi-word cities: all words except the last form the city name.
+Casablanca 35
+Rabat 30
+Marrakech 40
+Fès 38
+Tanger 45
+Agadir 42
+Oujda 50
+Laayoune 55
+Kenitra 32
+Mohammedia 33
+El Jadida 36
+Safi 38
+Beni Mellal 40
+Khénifra 44
+Essaouira 41

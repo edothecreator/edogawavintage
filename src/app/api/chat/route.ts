@@ -2,9 +2,15 @@ import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { AI_BRAND } from "@/lib/ai-brand";
 import { tryDb } from "@/lib/db-safe";
 import { parseJsonArray } from "@/lib/format";
 import { toProductCard } from "@/lib/product-types";
+import { enforceChatRateLimit } from "@/lib/chat-rate-limit";
+
+export const runtime = "nodejs";
+export const maxDuration = 60;
+export const dynamic = "force-dynamic";
 
 const bodySchema = z.object({
   messages: z
@@ -56,24 +62,71 @@ const replySchema = z.object({
   recommendedSlugs: z.array(z.string()).max(6).optional().default([]),
 });
 
+function buildSystemInstruction(catalog: CatalogItem[]): string {
+  return `You are **${AI_BRAND.name}** — ${AI_BRAND.roleShort} at Edogawa Vintage, a premium vintage & digicam atelier.
+
+IDENTITY (stay in character, briefly):
+${AI_BRAND.identity}
+
+VOICE & SHAPE:
+- Friendly, stylish, human—never robotic or corporate.
+- **Short by default** (about 2–5 tight sentences). Go longer only if the user clearly asks for depth.
+- Decisive and warm; avoid long hedging or “I cannot” dead-ends.
+- Stay positive: never preach negativity; offer a path.
+
+INVENTORY (hard rules):
+- The ONLY products that exist are objects in the JSON array \`catalog\` below (each is in stock now).
+- You MUST NOT invent SKUs, prices, or items outside catalog.
+- Field \`recommendedSlugs\` may ONLY contain values from catalog[].slug.
+
+WHEN THE ASK DOESN’T MATCH ANYTHING EXACTLY:
+- NEVER stop at “we don’t have that.” Always pivot.
+- Choose the **closest** in-stock picks (vibe, era, film vs digital, compact vs SLR, brand family, focal “feel”, budget band).
+- Explain **confidently** in one crisp beat why each pick carries the same soul as their ask.
+- Populate recommendedSlugs with those closest picks (1–3) whenever possible.
+
+STOCK & TONE:
+- Prioritize in-stock recommendations; if something implied is absent, nod briefly, then steer to the nearest live alternative.
+- Multilingual: mirror the user’s language for the reply text.
+
+OFF LIMITS:
+- Order tracking, shipment status, payment disputes → politely refuse and point to human support / Contact.
+
+OUTPUT — JSON only, no markdown fences:
+{ "reply": string (you may use **bold** for model names), "recommendedSlugs": string[] }
+
+catalog:
+${JSON.stringify(catalog)}`;
+}
+
 export async function POST(req: Request) {
   try {
+    const json = await req.json();
+    const parsed = bodySchema.safeParse(json);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid chat payload" }, { status: 400 });
+    }
+
     const key = process.env.GEMINI_API_KEY;
     if (!key) {
       return NextResponse.json(
         {
-          reply:
-            "The concierge is resting—add GEMINI_API_KEY to enable multilingual assistance. Meanwhile, browse the shop or contact us for guidance.",
+          reply: AI_BRAND.geminiRestingMessage,
           products: [],
         },
         { status: 200 },
       );
     }
 
-    const json = await req.json();
-    const parsed = bodySchema.safeParse(json);
-    if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid chat payload" }, { status: 400 });
+    const limited = await enforceChatRateLimit(req);
+    if (!limited.ok) {
+      return NextResponse.json(
+        { error: limited.message, code: "RATE_LIMIT" },
+        {
+          status: 429,
+          headers: { "Retry-After": String(limited.retryAfterSec) },
+        },
+      );
     }
 
     const catalog = await loadInStockCatalog();
@@ -85,25 +138,9 @@ export async function POST(req: Request) {
       model: modelName,
       generationConfig: {
         responseMimeType: "application/json",
-        temperature: 0.35,
+        temperature: 0.4,
       },
-      systemInstruction: `You are the Edogawa Vintage concierge—a premium camera boutique assistant.
-
-STRICT RULES:
-- You MUST NOT invent store inventory. The ONLY products that exist in our store are in the JSON array "catalog" below.
-- When the user asks for recommendations, budgets, comparisons, or "what should I buy", you MUST choose recommendedSlugs ONLY from catalog[].slug values that appear in that array.
-- If nothing in catalog fits, set recommendedSlugs to [] and clearly say we do not have a suitable in-stock item at the moment (in the user's language).
-- Never claim we stock an item unless its slug is in catalog.
-- Exclude sold-out or unavailable items—they are not present in catalog (catalog is in-stock only).
-- Do NOT provide order tracking, order status, or shipment details. If asked, politely refuse and invite the customer to contact human support via the Contact page.
-- You MAY answer general camera education (film vs digital, lenses, exposure, genres) normally.
-- Match the user's language when replying.
-
-OUTPUT: JSON only with shape:
-{ "reply": string (can use **bold** sparingly), "recommendedSlugs": string[] }
-
-catalog:
-${JSON.stringify(catalog)}`,
+      systemInstruction: buildSystemInstruction(catalog),
     });
 
     let msgs = [...parsed.data.messages];
@@ -131,8 +168,7 @@ ${JSON.stringify(catalog)}`,
       data = JSON.parse(text);
     } catch {
       return NextResponse.json({
-        reply:
-          "I had trouble shaping that answer. Could you rephrase your question? I can still help with cameras and our in-stock pieces.",
+        reply: `${AI_BRAND.name} lost the thread—try once more with a vibe, budget, or brand? I’ll stay in stock.`,
         products: [],
       });
     }
@@ -140,8 +176,7 @@ ${JSON.stringify(catalog)}`,
     const out = replySchema.safeParse(data);
     if (!out.success) {
       return NextResponse.json({
-        reply:
-          "Let me try again in a moment—our boutique assistant stumbled. Ask again with your budget or style preference.",
+        reply: `Quick reset—tell me budget or aesthetic, and I’ll pull live picks from the shelf.`,
         products: [],
       });
     }
@@ -169,7 +204,7 @@ ${JSON.stringify(catalog)}`,
     console.error(e);
     return NextResponse.json(
       {
-        reply: "Something went wrong reaching the assistant. Please try again shortly.",
+        reply: `${AI_BRAND.name} hit a snag—try again in a moment.`,
         products: [],
       },
       { status: 200 },

@@ -1,5 +1,3 @@
-export const DELIVERY_FEE_USD = 12;
-
 export const ORDER_STATUSES = [
   "pending",
   "confirmed",

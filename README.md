@@ -1,6 +1,6 @@
 # Edogawa Vintage
 
-Premium, mobile-first camera e-commerce built with **Next.js 16** (App Router), **Prisma** + **SQLite**, **Tailwind CSS 4**, and an optional **Google Gemini** concierge that only recommends **in-stock** products from the live database.
+Premium, mobile-first camera e-commerce built with **Next.js 16** (App Router), **Prisma**, **Tailwind CSS 4**, optional **Google Gemini** assistant (**Monsieur Iso**) grounded in **in-stock** catalog data, and city-based shipping via a root **`Tarif`** file.
 
 ## Features
 
@@ -88,7 +88,10 @@ Checkout records `paymentMethod: "card"` or `"cod"`. Card capture is intentional
 | `DATABASE_URL` | **Yes** | SQLite connection string (e.g. `file:./dev.db` — path relative to `prisma/`) |
 | `ADMIN_PASSWORD` | **Yes** | Password for `/admin/login` |
 | `ADMIN_JWT_SECRET` | **Yes** | Secret for signing admin session cookies (use a long random string in production) |
-| `GEMINI_API_KEY` | No | Enables AI concierge; if empty, chat returns a friendly “add key” message |
+| `GEMINI_API_KEY` | No | Enables **Monsieur Iso**; if empty, chat returns a friendly “add key” message |
+| `CHAT_RATE_LIMIT_PER_MINUTE` | No | Default `12` — IP-hashed chat rate limit (needs DB) |
+| `CHAT_RATE_LIMIT_PER_HOUR` | No | Default `80` |
+| `CHAT_RATE_IP_SALT` | No | Extra salt for IP hashing (falls back to `ADMIN_JWT_SECRET`) |
 | `GEMINI_MODEL` | No | Gemini model id (default in code: `gemini-2.0-flash`) |
 | `NEXT_PUBLIC_SITE_URL` | No | Canonical URL for metadata / Open Graph (default `http://localhost:3000`) |
 

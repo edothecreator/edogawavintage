@@ -87,3 +87,12 @@ model Testimonial {
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
 }
+
+/// IP-hashed keys for /api/chat rate limiting (Vercel-safe with shared DB).
+model ChatRequestLog {
+  id        String   @id @default(cuid())
+  ipKey     String
+  createdAt DateTime @default(now())
+
+  @@index([ipKey, createdAt])
+}

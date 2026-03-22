@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Renders concierge/user text; treats **segments** like markdown bold (Gemini often uses this).
+ * Renders assistant/user text; treats **segments** like markdown bold (Gemini often uses this).
  */
 export function ChatMessageText({
   content,

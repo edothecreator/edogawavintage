@@ -3,7 +3,7 @@ import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { isDatabaseUnavailableError, tryDb } from "@/lib/db-safe";
-import { DELIVERY_FEE_USD } from "@/lib/constants";
+import { getFeeForCity, loadShippingTariffsFromDisk } from "@/lib/shipping-tariff";
 import { trackPurchase } from "@/lib/analytics";
 
 const lineSchema = z.object({
@@ -29,6 +29,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid checkout data" }, { status: 400 });
     }
     const { customerName, phone, address, city, note, paymentMethod, items } = parsed.data;
+
+    const tariffs = loadShippingTariffsFromDisk();
+    const shippingFee = getFeeForCity(tariffs, city);
+    if (shippingFee === null) {
+      return NextResponse.json(
+        { error: "Choose a valid city from the shipping list." },
+        { status: 400 },
+      );
+    }
 
     const productIds = [...new Set(items.map((i) => i.productId))];
     const loaded = await tryDb(() =>
@@ -78,7 +87,7 @@ export async function POST(req: Request) {
       });
     }
 
-    const deliveryFee = new Prisma.Decimal(DELIVERY_FEE_USD);
+    const deliveryFee = new Prisma.Decimal(shippingFee);
     const total = subtotal.add(deliveryFee);
 
     const order = await prisma.$transaction(async (tx) => {
@@ -126,6 +135,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       id: order.id,
       total: Number(order.total),
+      deliveryFee: Number(order.deliveryFee),
       paymentMethod: order.paymentMethod,
     });
   } catch (e) {

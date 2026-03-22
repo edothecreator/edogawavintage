@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useMemo } from "react";
 import { useCartStore, useCartStoreHydrated } from "@/lib/cart-store";
-import { DELIVERY_FEE_USD } from "@/lib/constants";
 import { formatMoney, summarizeCartMoney } from "@/lib/format";
 import { Button } from "@/components/ui/Button";
 
@@ -18,8 +17,6 @@ export default function CartPage() {
     () => summarizeCartMoney(lines),
     [lines],
   );
-  const delivery = lines.length ? DELIVERY_FEE_USD : 0;
-  const total = subtotal + delivery;
 
   if (!hydrated) {
     return (
@@ -128,8 +125,7 @@ export default function CartPage() {
               <h2 className="font-display text-xl text-[var(--ev-text)]">Summary</h2>
               {mixedCurrency && (
                 <p className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200/90">
-                  Your cart mixes currencies. Checkout assumes USD for delivery; confirm totals with
-                  our team if needed.
+                  Your cart mixes currencies—confirm totals with our team at checkout if needed.
                 </p>
               )}
               <div className="space-y-2 text-sm text-[var(--ev-text-muted)]">
@@ -137,13 +133,9 @@ export default function CartPage() {
                   <span>Subtotal</span>
                   <span className="text-[var(--ev-text)]">{formatMoney(subtotal, currency)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Delivery</span>
-                  <span className="text-[var(--ev-text)]">{formatMoney(delivery, currency)}</span>
-                </div>
-                <div className="flex justify-between border-t border-[var(--ev-border)] pt-2 text-base font-medium text-[var(--ev-text)]">
-                  <span>Total</span>
-                  <span>{formatMoney(total, currency)}</span>
+                <div className="flex justify-between gap-3 border-t border-[var(--ev-border)] pt-2 text-xs text-[var(--ev-text-muted)]">
+                  <span>Shipping</span>
+                  <span className="text-right text-[var(--ev-text)]">Added at checkout by city</span>
                 </div>
               </div>
               <Link href="/checkout" className="block">
@@ -166,9 +158,9 @@ export default function CartPage() {
               <p className="mb-2 text-[10px] text-amber-200/90">Mixed currencies—confirm at checkout.</p>
             )}
             <div className="mb-3 flex items-center justify-between text-sm">
-              <span className="text-[var(--ev-text-muted)]">Total</span>
+              <span className="text-[var(--ev-text-muted)]">Subtotal</span>
               <span className="font-display text-xl text-[var(--ev-primary)]">
-                {formatMoney(total, currency)}
+                {formatMoney(subtotal, currency)}
               </span>
             </div>
             <Link href="/checkout" className="block">

@@ -14,6 +14,8 @@ import { SectionTitle } from "@/components/layout/SectionTitle";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { DbFallbackNotice } from "@/components/site/DbFallbackNotice";
+import { HomeAiInvite } from "@/components/home/HomeAiInvite";
+import { AI_BRAND } from "@/lib/ai-brand";
 
 export default async function HomePage() {
   const home = await tryDb(() =>
@@ -176,7 +178,7 @@ export default async function HomePage() {
             {[
               { t: "Verified function", d: "Shutter, sensor, transport—checked to context." },
               { t: "Honest grading", d: "Mint to Fair, with notes you can rely on." },
-              { t: "Concierge AI", d: "Multilingual guidance grounded in live inventory." },
+              { t: `${AI_BRAND.name}`, d: AI_BRAND.trustBlurb },
               { t: "Quiet service", d: "No hype—just careful humans behind each order." },
             ].map((x) => (
               <div
@@ -192,28 +194,7 @@ export default async function HomePage() {
       </section>
 
       <section className="ev-container py-16 sm:py-20">
-        <div className="overflow-hidden rounded-[var(--ev-radius)] border border-[var(--ev-border-strong)] bg-[radial-gradient(circle_at_20%_20%,rgba(201,169,98,0.18),transparent_45%),var(--ev-surface)] p-8 sm:p-12">
-          <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
-            <div className="space-y-4">
-              <p className="text-[10px] uppercase tracking-[0.45em] text-[var(--ev-primary)]">
-                Concierge
-              </p>
-              <h3 className="font-display text-3xl text-[var(--ev-text)]">
-                Multilingual assistant, grounded in what we actually stock
-              </h3>
-              <p className="text-sm leading-relaxed text-[var(--ev-text-muted)]">
-                Ask about film stocks, travel kits, or the right body for night markets. The concierge
-                only recommends in-stock pieces—never hallucinated SKUs.
-              </p>
-            </div>
-            <div className="rounded-[var(--ev-radius-sm)] border border-[var(--ev-border)] bg-[var(--ev-bg)]/80 p-6 text-sm text-[var(--ev-text-muted)]">
-              <p className="text-[var(--ev-text)]">“I need a quiet street camera under $2000.”</p>
-              <p className="mt-3">
-                The widget bottom-right opens a calm, branded panel—try it in your own language.
-              </p>
-            </div>
-          </div>
-        </div>
+        <HomeAiInvite />
       </section>
 
       <section className="ev-container space-y-10 pb-20">
