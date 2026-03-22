@@ -1,0 +1,159 @@
+@import "tailwindcss";
+
+:root {
+  /* Brand — warm gold on near-black */
+  --ev-primary: #d4b56a;
+  --ev-primary-dim: #b8974f;
+  --ev-secondary: #2d4a5c;
+  --ev-accent: #e8a090;
+  --ev-bg: #070708;
+  --ev-bg-elevated: #0e0e12;
+  --ev-surface: #14141a;
+  --ev-surface-hover: #1c1c24;
+  --ev-border: rgba(255, 255, 255, 0.07);
+  --ev-border-strong: rgba(212, 181, 106, 0.38);
+  --ev-text: #f6f3ec;
+  --ev-text-muted: #9895a3;
+  --ev-veil: rgba(7, 7, 8, 0.72);
+  --ev-glow: rgba(212, 181, 106, 0.14);
+  --ev-radius: 16px;
+  --ev-radius-sm: 11px;
+  --ev-shadow-soft: 0 24px 80px rgba(0, 0, 0, 0.55);
+  --ev-shadow-card: 0 16px 48px rgba(0, 0, 0, 0.42);
+  --ev-ring-gold: 0 0 0 1px rgba(212, 181, 106, 0.25);
+}
+
+@theme inline {
+  --color-ev-bg: var(--ev-bg);
+  --color-ev-bg-elevated: var(--ev-bg-elevated);
+  --color-ev-surface: var(--ev-surface);
+  --color-ev-surface-hover: var(--ev-surface-hover);
+  --color-ev-primary: var(--ev-primary);
+  --color-ev-primary-dim: var(--ev-primary-dim);
+  --color-ev-secondary: var(--ev-secondary);
+  --color-ev-accent: var(--ev-accent);
+  --color-ev-text: var(--ev-text);
+  --color-ev-muted: var(--ev-text-muted);
+  --color-ev-border: var(--ev-border);
+  --font-display: var(--font-display), ui-serif, Georgia, serif;
+  --font-sans: var(--font-sans), system-ui, sans-serif;
+  --animate-ev-fade: ev-fade 0.6s ease-out both;
+  --animate-ev-float: ev-float 9s ease-in-out infinite;
+}
+
+@keyframes ev-fade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ev-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes ev-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(120%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes ev-cart-badge-pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes ev-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--ev-bg);
+  background-image:
+    radial-gradient(ellipse 90% 55% at 50% -25%, rgba(212, 181, 106, 0.085), transparent 55%),
+    radial-gradient(ellipse 50% 45% at 110% 35%, rgba(45, 74, 92, 0.14), transparent 50%),
+    radial-gradient(ellipse 40% 35% at -10% 60%, rgba(232, 160, 144, 0.06), transparent 45%);
+  background-attachment: fixed;
+  color: var(--ev-text);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: rgba(201, 169, 98, 0.35);
+  color: var(--ev-text);
+}
+
+/* Focus rings — accessible, on-brand */
+:focus-visible {
+  outline: 2px solid var(--ev-primary);
+  outline-offset: 3px;
+}
+
+/* Safe horizontal insets for notched phones + comfortable mobile gutters */
+.ev-container {
+  @apply mx-auto w-full max-w-6xl;
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
+}
+
+@media (min-width: 640px) {
+  .ev-container {
+    padding-left: max(1.5rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1.5rem, env(safe-area-inset-right, 0px));
+  }
+}
+
+@media (min-width: 1024px) {
+  .ev-container {
+    padding-left: max(2rem, env(safe-area-inset-left, 0px));
+    padding-right: max(2rem, env(safe-area-inset-right, 0px));
+  }
+}
+
+/* Faster tap response on controls (mobile) */
+.ev-touch {
+  touch-action: manipulation;
+}
+
+.ev-grain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  opacity: 0.038;
+  z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+

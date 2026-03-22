@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  description String?
+  products    Product[]
+}
+
+model Product {
+  id               String      @id @default(cuid())
+  slug             String      @unique
+  name             String
+  brand            String
+  categoryId       String
+  category         Category    @relation(fields: [categoryId], references: [id])
+  price            Decimal
+  currency         String      @default("USD")
+  condition        String
+  shortDescription String
+  fullDescription  String
+  specs            Json
+  includedItems    Json
+  images           Json
+  thumbnail        String
+  inStock          Boolean     @default(true)
+  quantity         Int         @default(0)
+  featured         Boolean     @default(false)
+  tags             Json
+  badge            String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  orderItems       OrderItem[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  customerName  String
+  phone         String
+  address       String
+  city          String
+  note          String?
+  paymentMethod String
+  subtotal      Decimal
+  deliveryFee   Decimal
+  total         Decimal
+  status        String      @default("pending")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  name      String
+  slug      String
+  price     Decimal
+  quantity  Int
+  image     String?
+}
+
+model Faq {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Testimonial {
+  id        String   @id @default(cuid())
+  quote     String
+  author    String
+  role      String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+}
