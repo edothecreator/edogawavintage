@@ -9,14 +9,14 @@ const stockPhoto = (id: string) =>
 
 export const DEMO_DIGITAL_CATEGORY: Category = {
   id: "demo-cat-digital",
-  slug: "digital-cameras",
+  slug: "digitalcameras",
   name: "Digital cameras",
   description: "Preview category—connect a hosted database to load your real catalog.",
 };
 
 export const DEMO_FILM_CATEGORY: Category = {
   id: "demo-cat-film",
-  slug: "film-cameras",
+  slug: "filmcameras",
   name: "Film cameras",
   description: "Preview category—connect a hosted database to load your real catalog.",
 };

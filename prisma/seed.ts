@@ -15,14 +15,14 @@ async function main() {
 
   const digital = await prisma.category.create({
     data: {
-      slug: "digital-cameras",
+      slug: "digitalcameras",
       name: "Digital cameras",
       description: "Mirrorless and DSLR bodies curated for image quality and character.",
     },
   });
   const film = await prisma.category.create({
     data: {
-      slug: "film-cameras",
+      slug: "filmcameras",
       name: "Film cameras",
       description: "Analog bodies and rangefinders with timeless mechanical feel.",
     },

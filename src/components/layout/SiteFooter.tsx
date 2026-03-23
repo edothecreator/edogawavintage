@@ -41,7 +41,7 @@ export function SiteFooter() {
           </p>
           <div className="flex flex-wrap gap-3 text-xs uppercase tracking-[0.2em] text-[var(--ev-text-muted)]">
             <a
-              href="https://instagram.com"
+              href="https://instagram.com/edogawa.iid"
               target="_blank"
               rel="noreferrer"
               className="hover:text-[var(--ev-primary)]"

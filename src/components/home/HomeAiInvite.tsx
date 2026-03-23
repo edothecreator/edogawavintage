@@ -41,7 +41,7 @@ export function HomeAiInvite() {
             Try asking
           </p>
           <p className="mt-4 font-display text-lg text-[var(--ev-text)]">
-            “Quiet chrome compact for night markets—under $900.”
+            “I want something for night vibes under 750 DHS.”
           </p>
           <p className="mt-3 text-sm text-[var(--ev-text-muted)]">
             Short answers, closest in-stock soul-matches, and never a hallucinated SKU.

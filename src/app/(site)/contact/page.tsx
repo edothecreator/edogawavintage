@@ -41,7 +41,7 @@ export default function ContactPage() {
           Human support
         </h1>
         <p className="mt-4 text-sm leading-relaxed text-[var(--ev-text-muted)] sm:text-base">
-          For availability checks, condition photos, or pairing advice beyond Monsieur Iso, reach
+          For availability checks, condition photos, or pairing advice beyond Edo Assistant, reach
           our team directly.
         </p>
         <div className="mt-8 space-y-2 text-sm text-[var(--ev-text-muted)]">
@@ -50,7 +50,7 @@ export default function ContactPage() {
           </p>
           <p>
             <a
-              href="https://instagram.com"
+              href="https://instagram.com/edogawa.iid"
               target="_blank"
               rel="noreferrer"
               className="text-[var(--ev-primary)] underline-offset-4 hover:underline"

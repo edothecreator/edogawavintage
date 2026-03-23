@@ -15,7 +15,7 @@ export default function PrivacyPage() {
         </p>
         <h2 className="font-display text-xl text-[var(--ev-text)]">How we use data</h2>
         <p>
-          Order data is used for fulfillment and customer contact. Monsieur Iso (our shop assistant)
+          Order data is used for fulfillment and customer contact. Edo Assistant (our shop assistant)
           sends prompts to
           Google Gemini—do not include payment card numbers or government IDs in chat.
         </p>

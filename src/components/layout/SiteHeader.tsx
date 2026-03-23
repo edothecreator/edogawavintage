@@ -8,8 +8,8 @@ import { useCartFeedbackStore } from "@/lib/cart-feedback-store";
 
 const primaryLinks = [
   { href: "/shop", label: "Shop" },
-  { href: "/collections/digital-cameras", label: "Digital" },
-  { href: "/collections/film-cameras", label: "Film" },
+  { href: "/collections/digitalcameras", label: "Digital" },
+  { href: "/collections/filmcameras", label: "Film" },
   { href: "/collections/camcorders", label: "Camcorders" },
   { href: "/collections/accessories", label: "Accessories" },
 ];
